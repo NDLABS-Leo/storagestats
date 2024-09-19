@@ -44,24 +44,9 @@ Retrieval Success Rate = Number of Successful Retrievals / Number of Retrieval S
 
 ## 运行方式 / How to Run
 
-1. 克隆此项目库 / Clone this repository:
-   ```bash
-   git clone https://github.com/yourusername/retrieval-tool.git
-   ```
+访问网站：http://storagestats.ndlabs.io/
 
-2. 安装依赖项 / Install dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. 配置数据库 / Configure the database:
-   在 `config.json` 中配置你的数据库连接信息。
-   Configure your database connection in `config.json`.
-
-4. 运行检索工具 / Run the Retrieval Tool:
-   ```bash
-   python run_retrieval.py
-   ```
+Access the website: http://storagestats.ndlabs.io/
 
 ## 贡献 / Contributing
 
