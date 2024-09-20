@@ -14,21 +14,20 @@ This project, developed by ND Labs, aims to process a large number of deal order
 
 ### 1. 数据准备阶段 / Data Preparation Stage
 
-系统将每日新增的 deal 订单插入至自有数据库，目前每日新增约 30 多万条数据。
 
-The system inserts newly added deal orders into its own database every day, with approximately 300,000 new records being added daily.
+系统每日通过glif的deal数据库就行数据增量的更新，订单插入至自有Mongodb数据库。目前每日新增月10万条订单数据。
+https://marketdeals.s3.amazonaws.com/StateMarketDeals.json.zst
 
 ### 2. 抽样样本的逻辑 / Sampling Logic
 
-系统根据 LDN 及节点号筛选相关的 deal 订单，并按照时间顺序进行排序。系统会取这些 deal 订单中最新的 40% 作为抽样样本。
+系统根据clentID和providerID两个字段进行分组，对完成分组的数据进行排序，排序方式为以dealID降序排序。并取前40%的订单作为抽样样本数据。
 
-The system filters relevant deal orders based on LDN and node number, then sorts them by time. The latest 40% of these deal orders are selected as the sampling sample.
 
-### 3. 检索样本的逻辑 / Retrieval Sample Logic
+### 3. 检索测试 / Retrieval Sample Logic
 
-在抽样样本中，系统随机抽取 30% 的 deal 订单作为检索样本。每个节点的检索样本数量不超过 150 条。（具体条数根据程序负载而定）
-
-From the sampled deals, the system randomly selects 30% of the deal orders as the retrieval sample. The number of retrieval samples per node does not exceed 150 orders (the exact number may vary based on system load).
+1、将取值完成的前40%的抽样样本数据进行Sample。
+2、取节点的libp2p地址
+3、跟节点做交互，一笔deal会进行三种检索任务（Http、Graphsync、Bitswap）
 
 ### 4. 检索成功数 / Number of Successful Retrievals
 
