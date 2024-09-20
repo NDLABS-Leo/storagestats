@@ -58,17 +58,13 @@ Once the retrieval tests are executed, the system records the result of each tas
 
 检索成功率是衡量系统检索性能的重要指标，其计算公式如下：
 
-\[
-\text{检索成功率} = \frac{\text{检索成功数}}{\text{检索样本总数}}
-\]
+检索成功率=检索成功数\检索样本总数
 
 检索成功率表示系统在一批样本中成功完成检索的比率，该比率越高，表明系统性能越好。
 
 The **Retrieval Success Rate** is a critical metric for evaluating the retrieval performance of the system. It is calculated as follows:
 
-\[
-\text{Retrieval Success Rate} = \frac{\text{Number of Successful Retrievals}}{\text{Total Number of Retrieval Samples}}
-\]
+Retrieval Success Rate = Number of Successful Retrievals \ Total Number of Retrieval Samples
 
 The success rate reflects the percentage of successful retrievals out of the total sample size. A higher success rate indicates better system performance.
 
