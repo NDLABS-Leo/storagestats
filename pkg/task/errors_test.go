@@ -1,9 +1,9 @@
 package task
 
 import (
-	"github.com/data-preservation-programs/RetrievalBot/pkg/requesterror"
 	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
+	"storagestats/pkg/requesterror"
 	"testing"
 )
 

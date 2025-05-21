@@ -2,7 +2,6 @@ package net
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-datastore"
 	blockstore "github.com/ipfs/go-ipfs-blockstore"
@@ -16,6 +15,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/routing"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/slices"
+	"storagestats/pkg/task"
 	"time"
 )
 

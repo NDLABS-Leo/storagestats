@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
-	"github.com/data-preservation-programs/RetrievalBot/worker/bitswap"
 	logging "github.com/ipfs/go-log/v2"
+	"storagestats/pkg/task"
+	"storagestats/worker/bitswap"
 )
 
 func main() {

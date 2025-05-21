@@ -1,8 +1,8 @@
 package stub
 
 import (
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"math/rand"
+	"storagestats/pkg/task"
 	"time"
 )
 

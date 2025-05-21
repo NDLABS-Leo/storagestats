@@ -106,7 +106,7 @@ It is possible to check how good you, as a storage provider is performing in ter
 
 You may run a one-off test with your storage provider by following below instruction:
 ```
-go install github.com/data-preservation-programs/RetrievalBot/integration/oneoff@latest
+go install storagestats/integration/oneoff@latest
 oneoff <providerID> <dealID>
 ```
 

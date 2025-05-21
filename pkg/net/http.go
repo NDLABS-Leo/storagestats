@@ -2,13 +2,13 @@ package net
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/ipfs/go-cid"
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/pkg/errors"
 	"io"
 	"net/http"
 	"net/url"
+	"storagestats/pkg/task"
 	"time"
 )
 
@@ -72,7 +72,7 @@ func (c HTTPClient) RetrievePiece(
 			task.RetrievalFailure, errors.Errorf("status code: %d", resp.StatusCode)), nil
 	}
 
-	downloaded, err := io.CopyN(io.Discard, resp.Body, length)
+	downloaded, _ := io.CopyN(io.Discard, resp.Body, length)
 	if err != nil {
 		logger.Info(err)
 		return task.NewErrorRetrievalResultWithErrorResolution(task.RetrievalFailure, err), nil

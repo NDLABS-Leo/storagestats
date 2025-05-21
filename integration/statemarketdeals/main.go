@@ -8,9 +8,6 @@ import (
 	"strings"
 
 	"github.com/bcicen/jstream"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/env"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model/rpc"
 	logging "github.com/ipfs/go-log/v2"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/klauspost/compress/zstd"
@@ -19,6 +16,9 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"storagestats/pkg/env"
+	"storagestats/pkg/model"
+	"storagestats/pkg/model/rpc"
 )
 
 var logger = logging.Logger("state-market-deals")
@@ -124,13 +124,11 @@ func refresh(ctx context.Context) error {
 		//if err != nil {
 		//	return errors.Wrap(err, "failed to convert deal id to int")
 		//}
-		PieceSizeStr := strconv.FormatUint(deal.Proposal.PieceSize, 10)
-		pieceSize, _ := strconv.ParseInt(PieceSizeStr, 10, 64)
 
 		newDeal := model.DealState{
 			DealID:      int32(dealID),
 			PieceCID:    deal.Proposal.PieceCID.Root,
-			PieceSize:   pieceSize,
+			PieceSize:   deal.Proposal.PieceSize,
 			Label:       deal.Proposal.Label,
 			Verified:    deal.Proposal.VerifiedDeal,
 			Client:      deal.Proposal.Client,

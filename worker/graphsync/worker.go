@@ -2,11 +2,11 @@ package graphsync
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/net"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/ipfs/go-cid"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
+	"storagestats/pkg/net"
+	"storagestats/pkg/task"
 )
 
 type Worker struct{}

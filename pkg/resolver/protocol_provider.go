@@ -2,14 +2,14 @@ package resolver
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/requesterror"
 	cborutil "github.com/filecoin-project/go-cbor-util"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/libp2p/go-libp2p/core/peerstore"
 	"github.com/libp2p/go-libp2p/core/protocol"
 	"github.com/multiformats/go-multistream"
 	"golang.org/x/exp/slices"
+	"storagestats/pkg/model"
+	"storagestats/pkg/requesterror"
 	"time"
 
 	"github.com/libp2p/go-libp2p/core/host"

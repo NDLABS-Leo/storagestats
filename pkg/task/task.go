@@ -1,9 +1,9 @@
 package task
 
 import (
-	"github.com/data-preservation-programs/RetrievalBot/pkg/convert"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
+	"storagestats/pkg/convert"
 	"time"
 )
 

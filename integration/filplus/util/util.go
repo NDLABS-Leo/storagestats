@@ -5,17 +5,17 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/data-preservation-programs/RetrievalBot/pkg/convert"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/env"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/requesterror"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/ipfs/go-cid"
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
 	"golang.org/x/exp/slices"
+	"storagestats/pkg/convert"
+	"storagestats/pkg/env"
+	"storagestats/pkg/model"
+	"storagestats/pkg/requesterror"
+	"storagestats/pkg/resolver"
+	"storagestats/pkg/task"
 )
 
 var logger = logging.Logger("addTasks")

@@ -9,7 +9,7 @@ import (
 type DealState struct {
 	DealID      int32  `bson:"deal_id"`
 	PieceCID    string `bson:"piece_cid"`
-	PieceSize   int64  `bson:"piece_size"`
+	PieceSize   uint64 `bson:"piece_size"`
 	Label       string `bson:"label"`
 	Verified    bool   `bson:"verified"`
 	Client      string `bson:"client"`

@@ -1,4 +1,4 @@
-module github.com/data-preservation-programs/RetrievalBot
+module storagestats
 
 go 1.20
 

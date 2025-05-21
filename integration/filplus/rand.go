@@ -4,7 +4,7 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
+	"storagestats/pkg/model"
 )
 
 func weight(obj model.DealState, c float64, totalPerClient map[string]int64) float64 {

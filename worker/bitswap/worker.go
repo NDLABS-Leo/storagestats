@@ -2,17 +2,17 @@ package bitswap
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/convert"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/net"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/ipfs/go-cid"
 	logging "github.com/ipfs/go-log/v2"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/multiformats/go-multiaddr"
 	"github.com/pkg/errors"
+	"storagestats/pkg/convert"
+	"storagestats/pkg/model"
+	"storagestats/pkg/net"
+	"storagestats/pkg/resolver"
+	"storagestats/pkg/task"
 )
 
 type Worker struct{}

@@ -2,14 +2,14 @@ package process
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/env"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
 	"github.com/google/uuid"
 	logging "github.com/ipfs/go-log/v2"
 	"github.com/pkg/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"storagestats/pkg/env"
+	"storagestats/pkg/resolver"
 	"strings"
 	"time"
 )

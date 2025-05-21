@@ -2,7 +2,6 @@ package net
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	datatransfer "github.com/filecoin-project/go-data-transfer/v2"
 	retrievaltypes "github.com/filecoin-project/go-retrieval-types"
 	"github.com/filecoin-project/go-state-types/big"
@@ -17,6 +16,7 @@ import (
 	"github.com/libp2p/go-libp2p/core/host"
 	"github.com/libp2p/go-libp2p/core/peer"
 	"github.com/pkg/errors"
+	"storagestats/pkg/task"
 	"sync/atomic"
 	"time"
 )

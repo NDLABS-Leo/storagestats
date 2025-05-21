@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/process"
 	_ "github.com/joho/godotenv/autoload"
+	"storagestats/pkg/process"
 )
 
 func main() {

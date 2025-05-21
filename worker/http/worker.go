@@ -3,11 +3,6 @@ package http
 import (
 	"context"
 	"fmt"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/convert"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/net"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/ipfs/go-cid"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/multiformats/go-multiaddr"
@@ -15,6 +10,11 @@ import (
 	"github.com/pkg/errors"
 	net2 "net"
 	"net/url"
+	"storagestats/pkg/convert"
+	"storagestats/pkg/model"
+	"storagestats/pkg/net"
+	"storagestats/pkg/resolver"
+	"storagestats/pkg/task"
 	"strconv"
 )
 
@@ -136,7 +136,7 @@ func (e Worker) DoWork(tsk task.Task) (*task.RetrievalResult, error) {
 			errors.New("No HTTP endpoint found")), nil
 	}
 
-	size := 1024 * 1024
+	size := 100
 	if sizeStr, ok := tsk.Metadata["retrieve_size"]; ok {
 		size, err = strconv.Atoi(sizeStr)
 		if err != nil {

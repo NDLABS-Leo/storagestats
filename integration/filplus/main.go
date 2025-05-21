@@ -3,135 +3,79 @@ package main
 import (
 	"context"
 	"math/rand"
-	"sort"
 	"time"
 
-	"github.com/data-preservation-programs/RetrievalBot/integration/filplus/util"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/env"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	logging "github.com/ipfs/go-log/v2"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"storagestats/integration/filplus/util"
+	"storagestats/pkg/env"
+	"storagestats/pkg/model"
+	"storagestats/pkg/resolver"
+	"storagestats/pkg/task"
 )
 
 var logger = logging.Logger("filplus-integration")
 
-type Cache struct {
-	Data      []bson.M
-	Timestamp time.Time
-}
-
-var cache Cache
-
-func getCachedData(collection *mongo.Collection) []bson.M {
-	// Check if the cache is more than 24 hours old
-	if time.Since(cache.Timestamp).Hours() >= 12 {
-		// Cache is outdated, fetch fresh data
-		logger.Infof("Fetching fresh data...")
-
-		groupStage := bson.D{
-			{"$group", bson.D{
-				{"_id", bson.D{
-					{"client", "$client"},
-					{"provider", "$provider"},
-				}},
-				{"documents", bson.D{{"$push", "$$ROOT"}}},
-			}},
-		}
-
-		// Aggregate pipeline
-		cursor, err := collection.Aggregate(context.TODO(), mongo.Pipeline{groupStage})
-		if err != nil {
-			logger.Errorf("failed to Aggregate %v", err)
-			return nil
-		}
-		defer cursor.Close(context.TODO())
-
-		var pipelineResults []bson.M
-		for cursor.Next(context.TODO()) {
-			var result bson.M
-			if err := cursor.Decode(&result); err != nil {
-				logger.Errorf("Error decoding aggregation results: %v", err)
-			}
-			pipelineResults = append(pipelineResults, result)
-
-		}
-
-		// Update cache
-		cache.Data = pipelineResults
-		cache.Timestamp = time.Now()
-	} else {
-		logger.Infof("Using cached data...")
-	}
-
-	return cache.Data
-}
-
 func main() {
 	filplus := NewFilPlusIntegration()
-	// Grouping by client and provider
 	for {
-		// Fetch or update cache
-		pipelineResults := getCachedData(filplus.marketDealsCollection)
+		// Step 1: Group the deals by client and provider
+		dealsGrouped, err2 := getDealsGroupedByClientProvider(filplus.marketDealsCollection)
+		if err2 != nil {
+			logger.Error(err2)
+			continue
+		}
 
-		// Process each group
-		for _, group := range pipelineResults {
-			sampledDeal := make([]model.DealState, 100)
-			documents := group["documents"].(bson.A)
-			// Sorting documents by a certain criterion (e.g., timestamp or other)
-			// Assuming that the documents have a "timestamp" field
-			sort.Slice(documents, func(i, j int) bool {
-				return documents[i].(bson.M)["deal_id"].(int32) > documents[i].(bson.M)["deal_id"].(int32)
-			})
+		// Initialize timer
+		start := time.Now()
 
-			// Get the top 40%
-			top40Percent := documents[:int(float64(len(documents))*0.4)]
+		// Initialize random generator
+		rand.Seed(time.Now().UnixNano())
 
-			// Random sampling from the top 40%
-			rand.Seed(time.Now().UnixNano())
-			rand.Shuffle(len(top40Percent), func(i, j int) {
-				top40Percent[i], top40Percent[j] = top40Percent[j], top40Percent[i]
-			})
-
-			sampledData := top40Percent
-			if len(top40Percent) > 100 {
-				sampledData = top40Percent[:100]
-			}
-
-			logger.With("sampledDataCount", len(top40Percent)).Info("sampledDataCount")
-
-			// Perform operations on the sampled data
-			for i, document := range sampledData {
-				if bsonDoc, ok := document.(bson.M); ok {
-					sampledDeal[i] = model.DealState{
-						DealID:      bsonDoc["deal_id"].(int32),
-						PieceCID:    bsonDoc["piece_cid"].(string),
-						PieceSize:   bsonDoc["piece_size"].(int64),
-						Label:       bsonDoc["label"].(string),
-						Verified:    bsonDoc["verified"].(bool),
-						Client:      bsonDoc["client"].(string),
-						Provider:    bsonDoc["provider"].(string),
-						Start:       bsonDoc["start"].(int32),
-						End:         bsonDoc["end"].(int32),
-						SectorStart: bsonDoc["sector_start"].(int32),
-						Slashed:     bsonDoc["slashed"].(int32),
-						LastUpdated: bsonDoc["last_updated"].(int32),
-					}
+		// Step 2: Take the top 30% of each group and perform random sampling
+		for client, providerDeals := range dealsGrouped {
+			for provider, deals := range providerDeals {
+				// Take the top 30%
+				top30Count := int(float64(len(deals)) * 0.30)
+				if top30Count == 0 {
+					continue
 				}
-			}
+				top30Deals := deals[:top30Count]
 
-			err := filplus.RunOnce(context.TODO(), sampledDeal)
-			if err != nil {
-				logger.Error(err)
+				// Randomly sample up to 100 deals
+				sampleCount := 100
+				if len(top30Deals) < sampleCount {
+					sampleCount = len(top30Deals)
+				}
+
+				sampledDeals := make([]model.DealState, 0, sampleCount)
+				indices := rand.Perm(len(top30Deals))[:sampleCount]
+				for _, idx := range indices {
+					sampledDeals = append(sampledDeals, top30Deals[idx])
+				}
+
+				err := filplus.RunOnce(context.TODO(), sampledDeals)
+				if err != nil {
+					logger.Error(err)
+				}
+
+				// Log sampled deal info
+				logger.Infof("Client: %s, Provider: %s, Sampled Deals: %d\n", client, provider, len(sampledDeals))
+				for _, deal := range sampledDeals {
+					logger.Infof("DealID: %d, PieceCID: %s\n", deal.DealID, deal.PieceCID)
+				}
 			}
 		}
 
-		time.Sleep(time.Minute)
+		// Record end time and print duration
+		elapsed := time.Since(start)
+		logger.Infof("Processing dealsGrouped took: %s", elapsed)
+
+		//time.Sleep(time.Minute * 1)
 	}
 }
 
@@ -246,38 +190,85 @@ func NewFilPlusIntegration() *FilPlusIntegration {
 		randConst:             env.GetFloat64(env.FilplusIntegrationRandConst, 4.0),
 	}
 
-	
 }
 
-func (f *FilPlusIntegration) RunOnce(ctx context.Context, sampledDeal []model.DealState) error {
+// getDealsGroupedByClientProvider groups deals by client and provider, sorted by deal_id
+func getDealsGroupedByClientProvider(collection *mongo.Collection) (map[string]map[string][]model.DealState, error) {
+
+	cursor, err := collection.Aggregate(context.Background(), mongo.Pipeline{
+		{
+			{"$sort", bson.D{{"deal_id", -1}}}, // Sort by deal_id
+		}, // Sort by deal_id descending
+		{{"$limit", 30000000}}, // Limit to the most recent 30 million deals
+	})
+
+	if err != nil {
+		logger.Errorf("Failed to aggregate data: %v", err)
+		return nil, err
+	}
+	defer cursor.Close(context.Background())
+
+	var deals []model.DealState
+	if err := cursor.All(context.Background(), &deals); err != nil {
+		logger.Errorf("Failed to decode data: %v", err)
+		return nil, err
+	}
+
+	groupedDeals := make(map[string]map[string][]model.DealState)
+	for _, deal := range deals {
+		if _, ok := groupedDeals[deal.Client]; !ok {
+			groupedDeals[deal.Client] = make(map[string][]model.DealState)
+		}
+		groupedDeals[deal.Client][deal.Provider] = append(groupedDeals[deal.Client][deal.Provider], deal)
+	}
+
+	return groupedDeals, nil
+}
+
+// sampleTop30Percent randomly samples from the top 30% of deals
+func randomSampleFromGroup(deals []model.DealState, sampleSize int) []model.DealState {
+	// Randomize the order of the deals
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(deals), func(i, j int) {
+		deals[i], deals[j] = deals[j], deals[i]
+	})
+
+	// Ensure we take no more than sampleSize items
+	if len(deals) > sampleSize {
+		deals = deals[:sampleSize]
+	}
+
+	return deals
+}
+
+func (f *FilPlusIntegration) RunOnce(ctx context.Context, documentsOne []model.DealState) error {
 	logger.Info("start running filplus integration")
 
-	// If the task queue already have batch size tasks, do nothing
-	count, err := f.taskCollection.CountDocuments(ctx, bson.M{"requester": f.requester})
-	if err != nil {
-		return errors.Wrap(err, "failed to count tasks")
-	}
-
-	logger.With("count", count).Info("Current number of tasks in the queue")
-
-	if count > int64(f.batchSize) {
-		logger.Infof("task queue still have %d tasks, do nothing", count)
-
-		/* Remove old tasks that has stayed in the queue for too long
-		_, err = f.taskCollection.DeleteMany(ctx,
-			bson.M{"requester": f.requester, "created_at": bson.M{"$lt": time.Now().UTC().Add(-24 * time.Hour)}})
+	for {
+		// Check the number of tasks in the queue
+		count, err := f.taskCollection.CountDocuments(ctx, bson.M{"requester": f.requester})
 		if err != nil {
-			return errors.Wrap(err, "failed to remove old tasks")
+			return errors.Wrap(err, "failed to count tasks")
 		}
-		*/
-		return nil
+
+		logger.With("count", count).Info("Current number of tasks in the queue")
+
+		// If task count exceeds batch size, block and wait
+		if count > int64(f.batchSize) {
+			logger.Infof("Task queue still has %d tasks, waiting...", count)
+			time.Sleep(10 * time.Second) // Wait for 10 seconds before rechecking
+			continue
+		}
+
+		// Break loop when conditions are met and proceed to insert tasks
+		break
 	}
 
-	
-	tasks, results := util.AddTasks(ctx, f.requester, f.ipInfo, sampledDeal, f.locationResolver, f.providerResolver)
+	//documents = RandomObjects(documents, len(documents)/2, f.randConst, totalPerClient)
+	tasks, results := util.AddTasks(ctx, f.requester, f.ipInfo, documentsOne, f.locationResolver, f.providerResolver)
 
 	if len(tasks) > 0 {
-		_, err = f.taskCollection.InsertMany(ctx, tasks)
+		_, err := f.taskCollection.InsertMany(ctx, tasks)
 		if err != nil {
 			return errors.Wrap(err, "failed to insert tasks")
 		}
@@ -312,7 +303,7 @@ func (f *FilPlusIntegration) RunOnce(ctx context.Context, sampledDeal []model.De
 	}
 
 	if len(results) > 0 {
-		_, err = f.resultCollection.InsertMany(ctx, results)
+		_, err := f.resultCollection.InsertMany(ctx, results)
 		if err != nil {
 			return errors.Wrap(err, "failed to insert results")
 		}

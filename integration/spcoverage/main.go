@@ -4,10 +4,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/data-preservation-programs/RetrievalBot/integration/filplus/util"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/env"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
 	logging "github.com/ipfs/go-log/v2"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
@@ -16,6 +12,10 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"storagestats/integration/filplus/util"
+	"storagestats/pkg/env"
+	"storagestats/pkg/model"
+	"storagestats/pkg/resolver"
 )
 
 var logger = logging.Logger("spcoverage")

@@ -6,18 +6,18 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/data-preservation-programs/RetrievalBot/integration/filplus/util"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model/rpc"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
-	"github.com/data-preservation-programs/RetrievalBot/worker/bitswap"
-	"github.com/data-preservation-programs/RetrievalBot/worker/graphsync"
-	"github.com/data-preservation-programs/RetrievalBot/worker/http"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 	"github.com/ybbus/jsonrpc/v3"
+	"storagestats/integration/filplus/util"
+	"storagestats/pkg/model"
+	"storagestats/pkg/model/rpc"
+	"storagestats/pkg/resolver"
+	"storagestats/pkg/task"
+	"storagestats/worker/bitswap"
+	"storagestats/worker/graphsync"
+	"storagestats/worker/http"
 )
 
 //nolint:forbidigo,forcetypeassert,exhaustive
@@ -65,14 +65,12 @@ func main() {
 			if err != nil {
 				return errors.Wrap(err, "failed to get deal")
 			}
-			PieceSizeStr := strconv.FormatUint(deal.Proposal.PieceSize, 10)
-			pieceSize, err := strconv.ParseInt(PieceSizeStr, 10, 64)
 
 			dealStates := []model.DealState{
 				{
 					DealID:      int32(dealID),
 					PieceCID:    deal.Proposal.PieceCID.Root,
-					PieceSize:   pieceSize,
+					PieceSize:   deal.Proposal.PieceSize,
 					Label:       deal.Proposal.Label,
 					Verified:    deal.Proposal.VerifiedDeal,
 					Client:      deal.Proposal.Client,

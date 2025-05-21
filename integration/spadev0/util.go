@@ -4,15 +4,15 @@ import (
 	"context"
 	"time"
 
-	"github.com/data-preservation-programs/RetrievalBot/pkg/convert"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/env"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/requesterror"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/resolver"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
 	"github.com/filecoin-project/go-address"
 	"github.com/pkg/errors"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"storagestats/pkg/convert"
+	"storagestats/pkg/env"
+	"storagestats/pkg/requesterror"
+	"storagestats/pkg/resolver"
+	"storagestats/pkg/task"
 )
 
 func AddSpadeTasks(ctx context.Context, requester string, replicasToTest map[int][]Replica) error {

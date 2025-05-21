@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/data-preservation-programs/RetrievalBot/pkg/model"
 	"github.com/stretchr/testify/assert"
+	"storagestats/pkg/model"
 )
 
 func TestWeight(t *testing.T) {

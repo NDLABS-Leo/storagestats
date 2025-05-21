@@ -3,7 +3,7 @@ package task
 import (
 	"context"
 	"errors"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/requesterror"
+	"storagestats/pkg/requesterror"
 	"strings"
 )
 

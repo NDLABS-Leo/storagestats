@@ -2,9 +2,9 @@ package main
 
 import (
 	"context"
-	"github.com/data-preservation-programs/RetrievalBot/pkg/task"
-	"github.com/data-preservation-programs/RetrievalBot/worker/stub"
 	_ "github.com/joho/godotenv/autoload"
+	"storagestats/pkg/task"
+	"storagestats/worker/stub"
 )
 
 func main() {
